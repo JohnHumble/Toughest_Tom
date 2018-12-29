@@ -7,7 +7,7 @@ import pygame
 from socket import *
 from pygame.locals import *
 
-gravity = .1
+gravity = .03
 
 def load_png(name):
     # load image and return image object
@@ -34,12 +34,18 @@ class Turkey(pygame.sprite.Sprite):
         self.velocity = [0,0]
         self.state = "rest"
         self.rect = self.rect.move(x,y)
+
+        #boolean command veriables
+        self.right = False
+        self.left = False
         #TODO initialize all veriables here
 
     def update(self, platforms):
+        self.rect = self.rect.move(tuple(self.velocity))
+        
         #check if falling
         for wall in platforms:
-            if self.rect.colliderect(wall) == 1 and not self.state == "jumping":
+            if self.rect.colliderect(wall) == 1: # and not self.state == "jumping":
                 self.velocity[1] = 0
                 if (self.rect.top < wall.rect.top):
                     offset = self.rect.bottom - wall.rect.top
@@ -48,22 +54,26 @@ class Turkey(pygame.sprite.Sprite):
             else:
                 self.velocity[1] += gravity
                 
-        self.rect = self.rect.move(tuple(self.velocity))
         #TODO add all update logic here
 
     def moveleft(self):
         self.velocity[0] = -self.speed
-        self.state = 'moving'
+        self.left = True
 
     def moveright(self):
         self.velocity[0] = self.speed
-        self.state = 'moving'
+        self.right = True
 
     def movestop(self):
-        self.velocity[0] = 0
+        if (self.left):
+            self.moveleft()
+        elif (self.right):
+            self.moveright()
+        else:
+            self.velocity[0] = 0
 
     def jump(self):
-        #TODO make turkey move up some
+        self.velocity[1] = -10
         #TODO only allow this action some number of times after leaving the ground
 
         self.state = "jumping"

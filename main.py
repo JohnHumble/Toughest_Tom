@@ -69,10 +69,16 @@ def main ():
                     player1.moveleft()
                 elif event.key == K_RIGHT:
                     player1.moveright()
+                if event.key == K_UP:
+                    player1.jump()
 
             #user input keyup
             elif event.type == KEYUP:
-                if event.key == K_LEFT or event.key == K_RIGHT:
+                if event.key == K_LEFT:
+                    player1.left = False
+                    player1.movestop()
+                elif event.key == K_RIGHT:
+                    player1.right = False
                     player1.movestop()
                     player1.state = "rest"
             #TODO check user input and move acordingly KeyDOwn, KeyUP
