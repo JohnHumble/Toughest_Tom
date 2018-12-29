@@ -17,10 +17,19 @@ from objects import *
 # function to load files here
 # function to load in an image
 
+def resetGame(player1, player2):
+    player1 = Turkey(600,400)
+    player2 = Turkey(400, 400)
+
 def main ():
+    #veriables
+    gameWon = False
+    displayHeight = 640
+    displayWidth = 1024
+
     #initialize enviornment screen and background
     pygame.init()
-    screen = pygame.display.set_mode((1024,640))
+    screen = pygame.display.set_mode((displayWidth,displayHeight))
     pygame.display.set_caption('Toughest Tom')
     
     background = pygame.Surface(screen.get_size())
@@ -51,7 +60,7 @@ def main ():
     playersprites.draw(screen)
     pygame.display.flip()
 
-    #Initialize clock
+    #Initialize clock and game veriables
     clock = pygame.time.Clock()
 
     #event loop
@@ -75,12 +84,7 @@ def main ():
                 if event.key == K_SPACE:
                     player1.kick([player2])
 
-                #DELETE ME
-                if event.key == K_d:
-                    player1.hit(10,3)
-                if event.key == K_a:
-                    player1.hit(-10,3)
-                #DELETE ME
+                #player2
 
             #user input keyup
             elif event.type == KEYUP:
@@ -90,13 +94,36 @@ def main ():
                     player1.right = False
             #TODO check user input and move acordingly KeyDOwn, KeyUP
 
+        # check to see if anyone should die
+        if player1.rect.top > displayHeight + 100:
+            player1.alive = False
+        if player2.rect.top > displayHeight + 100:
+            player2.alive = False
+
         #blit out the objects
         screen.blit(background,player1.rect,player1.rect)
         screen.blit(background,player2.rect,player2.rect)
 
+        # check to see if anyone won or they all lost
+        # if so then reset the players
+        if player1.alive and not player2.alive:
+            print("Player1 Wins!")
+            player1.reset(600,400)
+            player2.reset(400,400)
+        elif player2.alive and not player1.alive:
+            print("Player2 Wins!")
+            player1.reset(600,400)
+            player2.reset(400,400)            
+        elif not player1.alive and not player2.alive:
+            print("Draw")
+            player1.reset(600,400)
+            player2.reset(400,400)
+
         #update moving objects
-        player1.update(platforms)
-        player2.update(platforms)
+        if player1.alive:
+            player1.update(platforms)
+        if player2.alive:
+            player2.update(platforms)
         #TODO update all objects that need it
 
         #draw the updated locations

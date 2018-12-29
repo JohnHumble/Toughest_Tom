@@ -44,7 +44,24 @@ class Turkey(pygame.sprite.Sprite):
         self.left = False
         self.onground = False
         self.faceleft = True
+        self.alive = True
         #TODO initialize all veriables here
+
+    def reset(self, x, y):
+        self.image = self.spriteLeft
+
+        self.speed = 1
+        self.velocity = [0,0]
+        self.rect.x = x
+        self.rect.y = y
+        self.jumpForce = 10
+
+        #boolean command veriables
+        self.right = False
+        self.left = False
+        self.onground = False
+        self.faceleft = True
+        self.alive = True
 
     def update(self, platforms):
         self.rect = self.rect.move(tuple(self.velocity))
