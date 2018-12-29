@@ -27,13 +27,22 @@ class Turkey(pygame.sprite.Sprite):
     """Player Object, Can move left, right and jump some number of times
     controled """
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, skin):
         pygame.sprite.Sprite.__init__(self)
         
-        self.spriteLeft, trash = load_png('TurkeyL.png')
-        self.spriteRight, self.rect = load_png('TurkeyR.png')
-        self.image = self.spriteLeft
-
+        if skin == "white":
+            self.spriteLeft, trash = load_png('TurkeyL.png')
+            self.spriteRight, self.rect = load_png('TurkeyR.png')
+            self.spriteKickL, trash = load_png('KickL.png')
+            self.spriteKickR, trash = load_png('KickR.png')
+            self.image = self.spriteLeft
+        elif skin == "brown":
+            self.spriteLeft, trash = load_png('TurkeyBrownL.png')
+            self.spriteRight, self.rect = load_png('TurkeyBrownR.png')
+            self.spriteKickL, trash = load_png('KickBrownL.png')
+            self.spriteKickR, trash = load_png('KickBrownR.png')
+            self.image = self.spriteLeft            
+        self.step = 0
         self.speed = 1
         self.velocity = [0,0]
         self.rect = self.rect.move(x,y)
@@ -70,11 +79,14 @@ class Turkey(pygame.sprite.Sprite):
         for wall in platforms:
             if self.rect.colliderect(wall) == 1: 
                 self.velocity[1] = 0
-                self.jumpForce = 10
-                self.onground = True
-                if (self.rect.top < wall.rect.top):
+                if (self.rect.top - self.velocity[1] < wall.rect.top):
+                    self.jumpForce = 10
+                    self.onground = True
                     offset = self.rect.bottom - wall.rect.top
                     self.rect = self.rect.move(0,-offset + 1)
+                else:
+                    offset = self.rect.top - wall.rect.bottom
+                    self.rect = self.rect.move(0,-offset)
                 break
             else:
                 self.velocity[1] += gravity
@@ -83,22 +95,32 @@ class Turkey(pygame.sprite.Sprite):
         maxspeed = 6
         if not self.onground:
             maxspeed = 10
-        if self.right:
+
+        # controled moving
+        if self.right and self.step < 5:
             self.faceleft = False
-            self.image = self.spriteRight
             if self.velocity[0] < maxspeed:
                 self.velocity[0] += self.speed
             else:
                 self.movestop()
-        if self.left:
+        if self.left and self.step < 10:
             self.faceleft = True
-            self.image = self.spriteLeft
             if self.velocity[0] > - maxspeed:
                 self.velocity[0] -= self.speed
             else:
                 self.movestop()
         if not self.left and not self.right:
             self.movestop()
+
+        #kicking cooldown
+        if self.step > 0:
+            self.step -= 1
+        else:
+            if self.faceleft:
+                self.image = self.spriteLeft
+            else:
+                self.image = self.spriteRight 
+
         #TODO add all update logic here
 
     def moveleft(self):
@@ -108,7 +130,7 @@ class Turkey(pygame.sprite.Sprite):
         self.right = True
 
     def movestop(self):
-        dampening = 1
+        dampening = .5
         if self.onground:
             if self.velocity[0] > dampening:
                 self.velocity[0] -= dampening
@@ -125,17 +147,22 @@ class Turkey(pygame.sprite.Sprite):
 
     #method to handle getting hit by something
     def hit(self, power, up):
-        self.velocity[0] += power
-        self.velocity[1] -= up
+        self.velocity[0] = power
+        self.velocity[1] = -up
 
     def kick(self,turkies):
+        self.step = 20 # number of tics to display the image
+        if self.faceleft:
+            self.image = self.spriteKickL
+        else:
+            self.image = self.spriteKickR
         for turkey in turkies:
             if self.rect.colliderect(turkey) == 1:
                 turkey.onground = False
                 if self.faceleft:
-                    turkey.hit(-5,2)
+                    turkey.hit(-10,2)
                 else:
-                    turkey.hit(5,2)
+                    turkey.hit(10,2)
 
 class Platform(pygame.sprite.Sprite):
     """Object that other objects can stand on. """

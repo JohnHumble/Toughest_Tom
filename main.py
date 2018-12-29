@@ -17,10 +17,6 @@ from objects import *
 # function to load files here
 # function to load in an image
 
-def resetGame(player1, player2):
-    player1 = Turkey(600,400)
-    player2 = Turkey(400, 400)
-
 def main ():
     #veriables
     gameWon = False
@@ -46,8 +42,8 @@ def main ():
 
     #initialize players 
     #TODO make this changeable in a menue
-    player1 = Turkey(600,400)
-    player2 = Turkey(400, 400)
+    player1 = Turkey(600,400, 'white')
+    player2 = Turkey(400, 400,'brown')
 
     #initialize sprites
     #TODO initialize sprites
@@ -75,6 +71,7 @@ def main ():
       
             #user input keydown
             elif event.type == KEYDOWN:
+                #player1
                 if event.key == K_LEFT:
                     player1.moveleft()
                 if event.key == K_RIGHT:
@@ -85,13 +82,29 @@ def main ():
                     player1.kick([player2])
 
                 #player2
+                if event.key == K_a:
+                    player2.moveleft()
+                if event.key == K_d:
+                    player2.moveright()
+                if event.key == K_w:
+                    player2.jump()
+                if event.key == K_LSHIFT:
+                    player2.kick([player1])
 
             #user input keyup
             elif event.type == KEYUP:
+                #player1
                 if event.key == K_LEFT:
                     player1.left = False
-                elif event.key == K_RIGHT:
+                if event.key == K_RIGHT:
                     player1.right = False
+                
+                #player2
+                if event.key == K_a:
+                    player2.left = False
+                if event.key == K_d:
+                    player2.right = False
+                
             #TODO check user input and move acordingly KeyDOwn, KeyUP
 
         # check to see if anyone should die
