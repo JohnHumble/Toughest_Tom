@@ -37,12 +37,13 @@ def main ():
 
     #initialize players 
     #TODO make this changeable in a menue
-    player1 = Turkey(400,400)
+    player1 = Turkey(600,400)
+    player2 = Turkey(400, 400)
 
     #initialize sprites
     #TODO initialize sprites
     platformSprites = pygame.sprite.RenderPlain(platforms)
-    playersprites = pygame.sprite.RenderPlain(player1)
+    playersprites = pygame.sprite.RenderPlain(player1,player2)
 
     #Blit everything to the background
     screen.blit(background,(0,0))
@@ -67,27 +68,35 @@ def main ():
             elif event.type == KEYDOWN:
                 if event.key == K_LEFT:
                     player1.moveleft()
-                elif event.key == K_RIGHT:
+                if event.key == K_RIGHT:
                     player1.moveright()
                 if event.key == K_UP:
                     player1.jump()
+                if event.key == K_SPACE:
+                    player1.kick([player2])
+
+                #DELETE ME
+                if event.key == K_d:
+                    player1.hit(10,3)
+                if event.key == K_a:
+                    player1.hit(-10,3)
+                #DELETE ME
 
             #user input keyup
             elif event.type == KEYUP:
                 if event.key == K_LEFT:
                     player1.left = False
-                    player1.movestop()
                 elif event.key == K_RIGHT:
                     player1.right = False
-                    player1.movestop()
-                    player1.state = "rest"
             #TODO check user input and move acordingly KeyDOwn, KeyUP
 
         #blit out the objects
         screen.blit(background,player1.rect,player1.rect)
+        screen.blit(background,player2.rect,player2.rect)
 
         #update moving objects
         player1.update(platforms)
+        player2.update(platforms)
         #TODO update all objects that need it
 
         #draw the updated locations
