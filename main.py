@@ -7,50 +7,20 @@ import os
 import getopt
 import pygame
 from socket import *
-from pygame.locals improt *
+from pygame.locals import *
+
+from objects import *
 
 #put files here to import
 
 
 # function to load files here
-
-# object classes
-class Turkey(pygame.sprite.Sprite):
-    """Player Object, Can move left, right and jump some number of times
-    controled """
-
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-
-        #TODO initialize all veriables here
-
-    def update(self):
-        #TODO add all update logic here
-
-    def moveleft(self):
-        #TODO make Turkey move left
-
-    def moveright(self):
-        #TODO make Turkey move right
-
-    def jump(self):
-        #TODO make turkey move up some
-        #TODO only allow this action some number of times after leaving the ground
-
-class Platform(pygame.sprite.Sprite):
-    """Object that other objects can stand on. """
-
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-
-        #TODO put any other initialization data here
-
-#TODO add items like wepons, powerups and such
+# function to load in an image
 
 def main ():
     #initialize enviornment screen and background
     pygame.init()
-    screen = pygame.display.set_mode((1024,800))
+    screen = pygame.display.set_mode((1024,640))
     pygame.display.set_caption('Toughest Tom')
     
     background = pygame.Surface(screen.get_size())
@@ -59,16 +29,26 @@ def main ():
 
     #initialize the background (use an algoritm to create platfoms and such)
     #TODO create terriain
+    numPlat = 20
+    platforms = pygame.sprite.Group()
+    for x in range(0,numPlat):
+        platform = Platform(x * 32 + 200,500)
+        platforms.add(platform)
 
     #initialize players 
     #TODO make this changeable in a menue
+    player1 = Turkey(400,400)
 
     #initialize sprites
     #TODO initialize sprites
+    platformSprites = pygame.sprite.RenderPlain(platforms)
+    playersprites = pygame.sprite.RenderPlain(player1)
 
     #Blit everything to the background
     screen.blit(background,(0,0))
-    pygame.flip()
+    platformSprites.draw(screen)
+    playersprites.draw(screen)
+    pygame.display.flip()
 
     #Initialize clock
     clock = pygame.time.Clock()
@@ -82,14 +62,33 @@ def main ():
         for event in pygame.event.get():
             if event.type == QUIT:
                 return
+      
+            #user input keydown
+            elif event.type == KEYDOWN:
+                if event.key == K_LEFT:
+                    player1.moveleft()
+                elif event.key == K_RIGHT:
+                    player1.moveright()
+
+            #user input keyup
+            elif event.type == KEYUP:
+                if event.key == K_LEFT or event.key == K_RIGHT:
+                    player1.movestop()
+                    player1.state = "rest"
             #TODO check user input and move acordingly KeyDOwn, KeyUP
 
-    #update objects
-    #TODO update all objects that need it
+        #blit out the objects
+        screen.blit(background,player1.rect,player1.rect)
 
-    #blit everything to the screen
-    #TODO blite objects here
+        #update moving objects
+        player1.update(platforms)
+        #TODO update all objects that need it
 
-    pygame.display.flip()
+        #draw the updated locations
+        playersprites.draw(screen)
+        platformSprites.draw(screen)
+        #TODO blite objects here
+
+        pygame.display.flip()
 
 if __name__ == '__main__': main()
