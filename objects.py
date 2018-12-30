@@ -84,23 +84,6 @@ class Turkey(pygame.sprite.Sprite):
         hitrect = self.rect.inflate(-16,-16)
 
 
-        #check if colliding with platform
-        for wall in platforms:
-            if self.rect.colliderect(wall) == 1: 
-                self.velocity[1] = 0
-                if (self.rect.top - self.velocity[1] < wall.rect.top):
-                    self.jumpForce = 10
-                    self.onground = True
-                    offset = self.rect.bottom - wall.rect.top
-                    self.rect = self.rect.move(0,-offset + 1)
-                else:
-                    offset = self.rect.top - wall.rect.bottom
-                    self.rect = self.rect.move(0,-offset)
-                break
-            else:
-                self.velocity[1] += gravity
-        
-
         #check if moving
         maxspeed = 6
         if not self.onground:
@@ -122,16 +105,32 @@ class Turkey(pygame.sprite.Sprite):
         if not self.left and not self.right:
             self.movestop()
 
+        #check if colliding with platform
+        for wall in platforms:
+            if self.rect.colliderect(wall) == 1: 
+                self.velocity[1] = 0
+                if (self.rect.top - self.velocity[1] < wall.rect.top):
+                    self.jumpForce = 10
+                    self.onground = True
+                    offset = self.rect.bottom - wall.rect.top
+                    self.rect = self.rect.move(0,-offset + 1)
+                else:
+                    offset = self.rect.top - wall.rect.bottom
+                    self.rect = self.rect.move(0,-offset)
+                break
+            else:
+                self.velocity[1] += gravity
+        
+
         #check if colliding with other
         if hitrect.colliderect(other) == 1:
-            #self.rect.move(-self.velocity[0],-self.velocity[1])
+            self.rect.move(-self.velocity[0],-self.velocity[1])
             x = -(self.velocity[0] + other.velocity[0]) / 1.5
             y = -(self.velocity[1] + other.velocity[1]) / 1.5
-            x = noZero(x,5)
-            y = noZero(y,5)
+            x = noZero(x,2)
+            y = noZero(y,2)
             self.velocity[0] = x
             self.velocity[1] = y
-            self.step = 5
 
         #kicking cooldown
         if self.step > 0:
