@@ -9,6 +9,12 @@ from pygame.locals import *
 
 gravity = .03
 
+def noZero(value):
+    if value > 0:
+        return max(value,1)
+    else:
+        return min(value,1)
+
 def load_png(name):
     # load image and return image object
     fullname = os.path.join('data',name)
@@ -72,10 +78,13 @@ class Turkey(pygame.sprite.Sprite):
         self.faceleft = True
         self.alive = True
 
-    def update(self, platforms):
+    def update(self, platforms, other):
         self.rect = self.rect.move(tuple(self.velocity))
         
-        #check if falling
+        hitrect = self.rect.inflate(-16,-16)
+
+
+        #check if colliding with platform
         for wall in platforms:
             if self.rect.colliderect(wall) == 1: 
                 self.velocity[1] = 0
@@ -91,6 +100,7 @@ class Turkey(pygame.sprite.Sprite):
             else:
                 self.velocity[1] += gravity
         
+
         #check if moving
         maxspeed = 6
         if not self.onground:
@@ -112,6 +122,17 @@ class Turkey(pygame.sprite.Sprite):
         if not self.left and not self.right:
             self.movestop()
 
+        #check if colliding with other
+        if hitrect.colliderect(other) == 1:
+            #self.rect.move(-self.velocity[0],-self.velocity[1])
+            x = -(self.velocity[0] + other.velocity[0])
+            y = -(self.velocity[1] + other.velocity[1])
+            x = noZero(x)
+            y = noZero(y)
+            self.velocity[0] = x
+            self.velocity[1] = y
+            self.step = 5
+            
         #kicking cooldown
         if self.step > 0:
             self.step -= 1
@@ -147,17 +168,19 @@ class Turkey(pygame.sprite.Sprite):
 
     #method to handle getting hit by something
     def hit(self, power, up):
-        self.velocity[0] = power
-        self.velocity[1] = -up
+        self.velocity[0] += power
+        self.velocity[1] -= up
 
     def kick(self,turkies):
         self.step = 20 # number of tics to display the image
         if self.faceleft:
             self.image = self.spriteKickL
+            hitrect = self.rect.move((-16,0))
         else:
             self.image = self.spriteKickR
+            hitrect = self.rect.move((16,0))
         for turkey in turkies:
-            if self.rect.colliderect(turkey) == 1:
+            if hitrect.colliderect(turkey) == 1:
                 turkey.onground = False
                 if self.faceleft:
                     turkey.hit(-10,2)

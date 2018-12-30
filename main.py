@@ -134,9 +134,9 @@ def main ():
 
         #update moving objects
         if player1.alive:
-            player1.update(platforms)
+            player1.update(platforms, player2)
         if player2.alive:
-            player2.update(platforms)
+            player2.update(platforms, player1)
         #TODO update all objects that need it
 
         #draw the updated locations
