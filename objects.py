@@ -17,7 +17,7 @@ def noZero(value, limit):
 
 def load_png(name):
     # load image and return image object
-    fullname = os.path.join('data',name)
+    fullname = os.path.join('graphics',name)
     try:
         image = pygame.image.load(fullname)
         if image.get_alpha() is None:
@@ -29,6 +29,15 @@ def load_png(name):
         raise 
     return image, image.get_rect()
 
+def load_wav(name):
+    fullname = os.path.join('sounds',name)
+    try:
+        sound = pygame.mixer.Sound(fullname)
+    except pygame.error as message:
+        print('Cannot load sound')
+        raise
+    return sound
+
 class Turkey(pygame.sprite.Sprite):
     """Player Object, Can move left, right and jump some number of times
     controled """
@@ -36,18 +45,34 @@ class Turkey(pygame.sprite.Sprite):
     def __init__(self, x, y, skin):
         pygame.sprite.Sprite.__init__(self)
         
-        if skin == "white":
-            self.spriteLeft, trash = load_png('TurkeyL.png')
-            self.spriteRight, self.rect = load_png('TurkeyR.png')
-            self.spriteKickL, trash = load_png('KickL.png')
-            self.spriteKickR, trash = load_png('KickR.png')
+        if skin == "red":
+            self.spriteLeft, trash = load_png('TurkeyRedL.png')
+            self.spriteRight, self.rect = load_png('TurkeyRedR.png')
+            self.spriteKickL, trash = load_png('KickRedL.png')
+            self.spriteKickR, trash = load_png('KickRedR.png')
             self.image = self.spriteLeft
         elif skin == "brown":
             self.spriteLeft, trash = load_png('TurkeyBrownL.png')
             self.spriteRight, self.rect = load_png('TurkeyBrownR.png')
             self.spriteKickL, trash = load_png('KickBrownL.png')
             self.spriteKickR, trash = load_png('KickBrownR.png')
-            self.image = self.spriteLeft            
+            self.image = self.spriteLeft 
+        elif skin == "purple":
+            self.spriteLeft, trash = load_png('TurkeyPurpleL.png')
+            self.spriteRight, self.rect = load_png('TurkeyPurpleR.png')
+            self.spriteKickL, trash = load_png('KickPurpleL.png')
+            self.spriteKickR, trash = load_png('KickPurpleR.png')
+            self.image = self.spriteLeft
+        else:
+            self.spriteLeft, trash = load_png('TurkeyL.png')
+            self.spriteRight, self.rect = load_png('TurkeyR.png')
+            self.spriteKickL, trash = load_png('KickL.png')
+            self.spriteKickR, trash = load_png('KickR.png')
+            self.image = self.spriteLeft
+
+        #load sounds
+        self.gobble = load_wav('gobble.wav')  
+        self.swoosh = load_wav('swoosh.wav')      
         self.step = 0
         self.speed = 1
         self.velocity = [0,0]
@@ -78,11 +103,10 @@ class Turkey(pygame.sprite.Sprite):
         self.faceleft = True
         self.alive = True
 
-    def update(self, platforms, other):
+    def update(self, platforms, others):
         self.rect = self.rect.move(tuple(self.velocity))
         
         hitrect = self.rect.inflate(-16,-16)
-
 
         #check if moving
         maxspeed = 6
@@ -123,14 +147,16 @@ class Turkey(pygame.sprite.Sprite):
         
 
         #check if colliding with other
-        if hitrect.colliderect(other) == 1:
-            self.rect.move(-self.velocity[0],-self.velocity[1])
-            x = -(self.velocity[0] + other.velocity[0]) / 1.5
-            y = -(self.velocity[1] + other.velocity[1]) / 1.5
-            x = noZero(x,2)
-            y = noZero(y,2)
-            self.velocity[0] = x
-            self.velocity[1] = y
+        for other in others:
+            if hitrect.colliderect(other) == 1:
+                self.rect.move(-self.velocity[0],-self.velocity[1])
+                x = -(self.velocity[0] + other.velocity[0]) / 1.5
+                y = -(self.velocity[1] + other.velocity[1]) / 1.5
+                x = noZero(x,2)
+                y = noZero(y,2)
+                self.velocity[0] = x
+                self.velocity[1] = y
+                break
 
         #kicking cooldown
         if self.step > 0:
@@ -167,10 +193,12 @@ class Turkey(pygame.sprite.Sprite):
 
     #method to handle getting hit by something
     def hit(self, power, up):
+        self.gobble.play()
         self.velocity[0] += power
         self.velocity[1] -= up
 
     def kick(self,turkies):
+        self.swoosh.play()
         self.step = 20 # number of tics to display the image
         if self.faceleft:
             self.image = self.spriteKickL
