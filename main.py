@@ -19,7 +19,8 @@ from objects import *
 
 def main ():
     #veriables
-    gameWon = False
+    score1 = 0
+    score2 = 0
     displayHeight = 640
     displayWidth = 1024
 
@@ -49,6 +50,20 @@ def main ():
     #TODO initialize sprites
     platformSprites = pygame.sprite.RenderPlain(platforms)
     playersprites = pygame.sprite.RenderPlain(player1,player2)
+
+    #initialize score display
+    font = pygame.font.Font(None,48)
+    texdis1 = "P1 - " + str(score1)
+    text1 = font.render(texdis1,False,(255,255,255))
+    textpos1 = text1.get_rect()
+    textpos1 = textpos1.move(displayHeight - textpos1.width - 10,10)
+    screen.blit(text1,textpos1)
+
+    texdis2 = "P2 - " + str(score2)
+    text2 = font.render(texdis1,False,(232,173,83))
+    textpos2 = text2.get_rect()
+    textpos2 = textpos2.move(10,10)
+    screen.blit(text2,textpos2)
 
     #Blit everything to the background
     screen.blit(background,(0,0))
@@ -123,10 +138,22 @@ def main ():
             print("Player1 Wins!")
             player1.reset(600,400)
             player2.reset(400,400)
+            score1 += 1
+            texdis1 = "P1 - " + str(score1)
+            text1 = font.render(texdis1,False,(255,255,255))
+            screen.blit(background,textpos1,textpos1)
+            screen.blit(background,textpos2,textpos2)
+
         elif player2.alive and not player1.alive:
             print("Player2 Wins!")
             player1.reset(600,400)
-            player2.reset(400,400)            
+            player2.reset(400,400)   
+            score2 += 1
+            texdis2 = "P2 - " + str(score2)
+            text2 = font.render(texdis2,False,(232,173,83))
+            screen.blit(background,textpos1,textpos1)
+            screen.blit(background,textpos2,textpos2)  
+
         elif not player1.alive and not player2.alive:
             print("Draw")
             player1.reset(600,400)
@@ -142,6 +169,9 @@ def main ():
         #draw the updated locations
         playersprites.draw(screen)
         platformSprites.draw(screen)
+        screen.blit(text1,textpos1)
+        screen.blit(text2,textpos2)
+
         #TODO blite objects here
 
         pygame.display.flip()

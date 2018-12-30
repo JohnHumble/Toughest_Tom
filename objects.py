@@ -182,9 +182,11 @@ class Turkey(pygame.sprite.Sprite):
             if hitrect.colliderect(turkey) == 1:
                 turkey.onground = False
                 if self.faceleft:
-                    turkey.hit(-10,2)
+                    turkey.hit(-8,8)
+                    turkey.onground = False
                 else:
-                    turkey.hit(10,2)
+                    turkey.hit(8,8)
+                    turkey.onground = False
 
 class Platform(pygame.sprite.Sprite):
     """Object that other objects can stand on. """
