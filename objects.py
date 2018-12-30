@@ -9,11 +9,11 @@ from pygame.locals import *
 
 gravity = .03
 
-def noZero(value):
+def noZero(value, limit):
     if value > 0:
-        return max(value,1)
+        return max(value,limit)
     else:
-        return min(value,1)
+        return min(value,limit)
 
 def load_png(name):
     # load image and return image object
@@ -125,14 +125,14 @@ class Turkey(pygame.sprite.Sprite):
         #check if colliding with other
         if hitrect.colliderect(other) == 1:
             #self.rect.move(-self.velocity[0],-self.velocity[1])
-            x = -(self.velocity[0] + other.velocity[0])
-            y = -(self.velocity[1] + other.velocity[1])
-            x = noZero(x)
-            y = noZero(y)
+            x = -(self.velocity[0] + other.velocity[0]) / 1.5
+            y = -(self.velocity[1] + other.velocity[1]) / 1.5
+            x = noZero(x,5)
+            y = noZero(y,5)
             self.velocity[0] = x
             self.velocity[1] = y
             self.step = 5
-            
+
         #kicking cooldown
         if self.step > 0:
             self.step -= 1
