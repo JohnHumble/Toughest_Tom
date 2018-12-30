@@ -85,7 +85,7 @@ class Turkey(pygame.sprite.Sprite):
         self.onground = False
         self.faceleft = True
         self.alive = True
-        #TODO initialize all veriables here
+        
 
     def reset(self, x, y):
         self.image = self.spriteLeft
@@ -188,7 +188,7 @@ class Turkey(pygame.sprite.Sprite):
     def jump(self):
         if self.jumpForce > 0:
             self.velocity[1] = -self.jumpForce
-            self.jumpForce -= 2
+            self.jumpForce -= 3
             self.onground = False
 
     #method to handle getting hit by something
